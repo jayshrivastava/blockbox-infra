@@ -29,23 +29,12 @@ database = client['test']  # connect to test database
 users_collection = database['users_']
 movies_collection = database['movies_']
 
-# Populate Movies Dict
-for i, movie in enumerate(movies):
-    title = movie[1]
-    id = movie[0]
-
-    # Safely get the movie date. Add movie to movies_dict if the movie release date is greater or equal to oldest_movie_date
-    date_chunk = title[len(title)-8:len(title)]
-    tmp1 = date_chunk.split('(')
-    if (len(tmp1) > 1):
-        year = int(tmp1[1].split(')')[0])
-        if year >= oldest_movie_date:
-            movies_dict[id] = title
-
 # Init Movies Dict
 for i, movie in enumerate(movies):
     title = movie[1]
     id = movie[0]
+    genres = movie[2].split('|')
+
 
     # Safely get the movie date. Add movie to movies_dict if the movie release date is greater or equal to oldest_movie_date
     date_chunk = title[len(title)-8:len(title)]
@@ -54,7 +43,8 @@ for i, movie in enumerate(movies):
         year = int(tmp1[1].split(')')[0])
         if year >= oldest_movie_date:
             movies_dict[id] = {
-                "title": title
+                "title": title,
+                "genres": genres
             }
    
 # Populate ratings in the movies dict and users dict IF the movie rated is in the movies dict
@@ -86,7 +76,7 @@ for i, rating in enumerate(ratings):
 users_to_insert = [ { 'user_id': user_id, 'ratings': users_dict[user_id], 'name': '' } for user_id in users_dict.keys()]
 movies_to_insert = [] 
 for movie_id in movies_dict:
-    movie_to_insert = { 'movie_id': movie_id, 'title': movies_dict[movie_id]['title'] }
+    movie_to_insert = { 'movie_id': movie_id, 'title': movies_dict[movie_id]['title'], 'genres': movies_dict[movie_id]['genres'] }
     if 'ratings' in movies_dict[movie_id]:
         movie_to_insert['ratings'] = movies_dict[movie_id]['ratings']
     movies_to_insert.append(movie_to_insert)
