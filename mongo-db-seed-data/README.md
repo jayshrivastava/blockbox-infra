@@ -9,7 +9,7 @@ Small: 100,000 ratings and 3,600 tag applications applied to 9,000 movies by 600
 
 Make sure you have pipenv installed. In the terminal run:
 
-1. `pipenv shell --python 3.7` (Creates a Venv)
+1. `pipenv shell --python 3.7` (Creates a new Venv)
 2. `pipenv install` (Installs Dependencies)
 3. `python main.py` (Runs the program)
 

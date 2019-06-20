@@ -26,8 +26,8 @@ users_dict = {}       # user id as key
 oldest_movie_date = 1990
 client = MongoClient(env['MONGO_DB_URI']) # mongo DB client
 database = client['test']  # connect to test database
-users_collection = database['users_2']
-movies_collection = database['movies_2']
+users_collection = database['users_3']
+movies_collection = database['movies_3']
 
 # Init Movies Dict
 for i, movie in enumerate(movies):
@@ -64,6 +64,12 @@ for i, rating in enumerate(ratings):
         if 'ratings' not in movies_dict[movie_id]:
             movies_dict[movie_id]['ratings'] = {}
         movies_dict[movie_id]['ratings'][user_id] =  float(rating_val)/5
+
+Populate ratings for movies which users have not rated
+for movie_id in movies_dict:
+    for user_id in users_dict:
+        if movie_id not in users_dict[user_id]:
+            users_dict[user_id][movie_id] = 0
 
 # Map Movies dict and users dict to arrays
 users_to_insert = [ { 'user_id': user_id, 'ratingsIndexedByMovieId': users_dict[user_id], 'name': '' } for user_id in users_dict.keys()]
