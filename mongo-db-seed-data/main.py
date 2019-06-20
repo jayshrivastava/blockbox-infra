@@ -26,15 +26,14 @@ users_dict = {}       # user id as key
 oldest_movie_date = 1990
 client = MongoClient(env['MONGO_DB_URI']) # mongo DB client
 database = client['test']  # connect to test database
-users_collection = database['users_']
-movies_collection = database['movies_']
+users_collection = database['users_2']
+movies_collection = database['movies_2']
 
 # Init Movies Dict
 for i, movie in enumerate(movies):
     title = movie[1]
     id = movie[0]
     genres = movie[2].split('|')
-
 
     # Safely get the movie date. Add movie to movies_dict if the movie release date is greater or equal to oldest_movie_date
     date_chunk = title[len(title)-8:len(title)]
@@ -56,29 +55,23 @@ for i, rating in enumerate(ratings):
     # add rating to users dict
     if movie_id in movies_dict:
         if user_id not in users_dict:
-            users_dict[user_id] = []
+            users_dict[user_id] = {}
         
-        users_dict[user_id].append({ 
-            'movie_id': movie_id, 
-            'rating': float(rating_val)/5
-        })
+        users_dict[user_id][movie_id] = float(rating_val)/5
 
     # add ratings to movies dict
     if movie_id in movies_dict:
         if 'ratings' not in movies_dict[movie_id]:
-            movies_dict[movie_id]['ratings'] = []
-        movies_dict[movie_id]['ratings'].append({ 
-            'user_id': user_id, 
-            'rating': float(rating_val)/5
-        })        
+            movies_dict[movie_id]['ratings'] = {}
+        movies_dict[movie_id]['ratings'][user_id] =  float(rating_val)/5
 
 # Map Movies dict and users dict to arrays
-users_to_insert = [ { 'user_id': user_id, 'ratings': users_dict[user_id], 'name': '' } for user_id in users_dict.keys()]
+users_to_insert = [ { 'user_id': user_id, 'ratingsIndexedByMovieId': users_dict[user_id], 'name': '' } for user_id in users_dict.keys()]
 movies_to_insert = [] 
 for movie_id in movies_dict:
     movie_to_insert = { 'movie_id': movie_id, 'title': movies_dict[movie_id]['title'], 'genres': movies_dict[movie_id]['genres'] }
     if 'ratings' in movies_dict[movie_id]:
-        movie_to_insert['ratings'] = movies_dict[movie_id]['ratings']
+        movie_to_insert['ratingsIndexedByUserId'] = movies_dict[movie_id]['ratings']
     movies_to_insert.append(movie_to_insert)
 
     
