@@ -18,16 +18,14 @@ with open('data/ratings.csv', 'r', encoding = 'utf-8-sig') as f:
 with open('env.json') as env_file:  
     env = json.load(env_file)
 
-
-
 # Global Vars
 movies_dict = {} # movie id as key
 users_dict = {}       # user id as key
 oldest_movie_date = 1990
 client = MongoClient(env['MONGO_DB_URI']) # mongo DB client
 database = client['test']  # connect to test database
-users_collection = database['users_6']
-movies_collection = database['movies_6']
+users_collection = database['users_7']
+movies_collection = database['movies_7']
 
 # Init Movies Dict
 for i, movie in enumerate(movies):
@@ -65,20 +63,23 @@ for i, rating in enumerate(ratings):
             movies_dict[movie_id]['ratings'] = {}
         movies_dict[movie_id]['ratings'][user_id] =  float(rating_val)/5
 
+# REMOVED DUMMY RATINGS FOR RECOMMENDATIONS V2 ENDPOINT
 # Populate ratings for movies which users have not rated
-for movie_id in movies_dict:
-    for user_id in users_dict:
-        if movie_id not in users_dict[user_id]:
-            users_dict[user_id][movie_id] = 0
-        if 'ratings' not in movies_dict[movie_id]:
-            movies_dict[movie_id]['ratings'] = {}
-        if user_id not in movies_dict[movie_id]['ratings']:
-            movies_dict[movie_id]['ratings'][user_id] = 0
+# for movie_id in movies_dict:
+#     for user_id in users_dict:
+#         if movie_id not in users_dict[user_id]:
+#             users_dict[user_id][movie_id] = 0
+#         if 'ratings' not in movies_dict[movie_id]:
+#             movies_dict[movie_id]['ratings'] = {}
+#         if user_id not in movies_dict[movie_id]['ratings']:
+#             movies_dict[movie_id]['ratings'][user_id] = 0
 
 
 # Map Movies dict and users dict to arrays
 users_to_insert = [ { 'userId': user_id, 'ratingsIndexedByMovieId': users_dict[user_id], 'name': '' } for user_id in users_dict.keys()]
-movies_to_insert = [{ 'movieId': movie_id, 'title': movies_dict[movie_id]['title'], 'genres': movies_dict[movie_id]['genres'], 'ratingsIndexedByUserId': movies_dict[movie_id]['ratings'] } for movie_id in movies_dict.keys()]
+# REMOVED RATINGS FROM MOVIES FOR V2 ENDPOINT
+# movies_to_insert = [{ 'movieId': movie_id, 'title': movies_dict[movie_id]['title'], 'genres': movies_dict[movie_id]['genres'], 'ratingsIndexedByUserId': movies_dict[movie_id]['ratings'] } for movie_id in movies_dict.keys()]
+movies_to_insert = [{ 'movieId': movie_id, 'title': movies_dict[movie_id]['title'], 'genres': movies_dict[movie_id]['genres'] } for movie_id in movies_dict.keys()]
     
 # Insert movies and users into database
 result = users_collection.insert_many(users_to_insert)
