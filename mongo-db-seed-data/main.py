@@ -2,6 +2,7 @@ import csv
 import json
 import pymongo
 from pymongo import MongoClient
+from pymongo import TEXT
 
 # Open files
 with open('data/movies.csv', 'r', encoding = 'utf-8-sig') as f:
@@ -25,7 +26,7 @@ oldest_movie_date = 1990
 client = MongoClient(env['MONGO_DB_URI']) # mongo DB client
 database = client['test']  # connect to test database
 users_collection = database['users_7']
-movies_collection = database['movies_7']
+movies_collection = database['movies_9']
 
 # Init Movies Dict
 for i, movie in enumerate(movies):
@@ -79,8 +80,9 @@ for i, rating in enumerate(ratings):
 users_to_insert = [ { 'userId': user_id, 'ratingsIndexedByMovieId': users_dict[user_id], 'name': '' } for user_id in users_dict.keys()]
 # REMOVED RATINGS FROM MOVIES FOR V2 ENDPOINT
 # movies_to_insert = [{ 'movieId': movie_id, 'title': movies_dict[movie_id]['title'], 'genres': movies_dict[movie_id]['genres'], 'ratingsIndexedByUserId': movies_dict[movie_id]['ratings'] } for movie_id in movies_dict.keys()]
-movies_to_insert = [{ 'movieId': movie_id, 'title': movies_dict[movie_id]['title'], 'genres': movies_dict[movie_id]['genres'] } for movie_id in movies_dict.keys()]
+movies_to_insert = [{ 'movieId': movie_id, 'title': movies_dict[movie_id]['title'], 'title_lower': movies_dict[movie_id]['title'].lower(), 'genres': movies_dict[movie_id]['genres'] } for movie_id in movies_dict.keys()]
     
 # Insert movies and users into database
 result = users_collection.insert_many(users_to_insert)
 result = movies_collection.insert_many(movies_to_insert)
+result = movies_collection.create_index([('title', TEXT)], default_language='english')
