@@ -25,8 +25,8 @@ users_dict = {}       # user id as key
 oldest_movie_date = 1990
 client = MongoClient(env['MONGO_DB_URI']) # mongo DB client
 database = client['test']  # connect to test database
-users_collection = database['users_7']
-movies_collection = database['movies_9']
+users_collection = database['users_8']
+movies_collection = database['movies_10']
 
 # Init Movies Dict
 for i, movie in enumerate(movies):
